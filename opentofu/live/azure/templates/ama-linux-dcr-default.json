@@ -1,0 +1,116 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dataCollectionRuleName": {
+      "type": "String",
+      "metadata": {
+        "description": "Specifies the name of the Data Collection Rule to create."
+      }
+    },
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "type": "String",
+      "metadata": {
+        "description": "Specifies the location in which to create the Data Collection Rule."
+      }
+    },
+    "workspaceResourceId": {
+      "type": "String",
+      "metadata": {
+        "description": "Specifies the Azure resource ID of the Log Analytics workspace to use."
+      }
+    },
+    "endpointResourceId": {
+      "type": "String",
+      "metadata": {
+        "description": "Specifies the Azure resource ID of the Data Collection Endpoint to use."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/dataCollectionRules",
+      "apiVersion": "2021-09-01-preview",
+      "name": "[parameters('dataCollectionRuleName')]",
+      "location": "[parameters('location')]",
+      "kind": "Linux",
+      "properties": {
+        "dataCollectionEndpointId": "[parameters('endpointResourceId')]",
+        "streamDeclarations": {},
+        "destinations": {
+          "logAnalytics": [
+            {
+              "workspaceResourceId": "[parameters('workspaceResourceId')]",
+              "name": "logAnalyticsWorkspace"
+            }
+          ]
+        },
+        "dataFlows": [
+          {
+            "destinations": [
+              "logAnalyticsWorkspace"
+            ],
+            "streams": [
+              "Microsoft-Syslog"
+            ],
+            "outputStream": "Microsoft-Syslog",
+            "transformKql": "source"
+          }
+        ],
+        "dataSources": {
+          "syslog": [
+            {
+              "name": "syslogDataSource",
+              "streams": [
+                "Microsoft-Syslog"
+              ],
+              "logLevels": [
+                "Info",
+                "Notice",
+                "Warning",
+                "Error",
+                "Critical",
+                "Alert",
+                "Emergency"
+              ],
+              "facilityNames": [
+                "alert",
+                "audit",
+                "auth",
+                "authpriv",
+                "clock",
+                "cron",
+                "daemon",
+                "ftp",
+                "kern",
+                "local0",
+                "local1",
+                "local2",
+                "local3",
+                "local4",
+                "local5",
+                "local6",
+                "local7",
+                "lpr",
+                "mail",
+                "news",
+                "nopri",
+                "ntp",
+                "syslog",
+                "user",
+                "uucp"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "dataCollectionRuleId": {
+      "type": "String",
+      "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('dataCollectionRuleName'))]"
+    }
+  }
+}

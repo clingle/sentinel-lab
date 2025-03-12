@@ -1,0 +1,22 @@
+x-container-spec: &container-spec
+  container_name: opentofu
+  build:
+    context: .
+  stdin_open: true
+  tty: true
+  network_mode: bridge
+  volumes:
+    - ./opentofu:/data
+
+name: opentofu
+services:
+  azure:
+    <<: *container-spec
+    env_file:
+      - ./lab.env
+    working_dir: /data/live/azure
+  proxmox:
+    <<: *container-spec
+    env_file:
+      - ./lab.env
+    working_dir: /data/live/proxmox
